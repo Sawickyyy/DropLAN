@@ -1,6 +1,8 @@
-const CACHE_NAME = "droplan-shell-v0.4.0";
+const CACHE_NAME = "droplan-shell-v0.5.0";
 const SHELL = [
   "/",
+  "/style.css",
+  "/app.js",
   "/manifest.webmanifest",
   "/icon-192.png",
   "/icon-512.png",
