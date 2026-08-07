@@ -16,6 +16,10 @@ public sealed class AppSettings
         "settings.json");
 
     public string? Language { get; set; }
+    public string Theme { get; set; } = "system";
+    public bool MinimizeToTray { get; set; } = true;
+    public bool TransferNotifications { get; set; } = true;
+    public bool AutoCheckUpdates { get; set; } = true;
 
     public static AppSettings Load()
     {
