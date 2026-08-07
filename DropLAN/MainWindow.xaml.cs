@@ -11,11 +11,10 @@ using WpfMessageBoxImage = System.Windows.MessageBoxImage;
 using WpfMessageBoxResult = System.Windows.MessageBoxResult;
 using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using WpfOpenFolderDialog = Microsoft.Win32.OpenFolderDialog;
-using Velopack;
 using System.Reflection;
 using System.Diagnostics;
 using System.ComponentModel;
-using Microsoft.Win32;
+using System.Globalization;
 using QRCoder;
 using System.IO;
 using System.Windows;
@@ -35,6 +34,13 @@ public partial class MainWindow : Window
     private readonly UpdateService _updateService = new();
     private TrayService? _tray;
     private bool _allowExit;
+
+    private static bool IsPolish =>
+        CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+            .Equals("pl", StringComparison.OrdinalIgnoreCase);
+
+    private static string T(string pl, string en) =>
+        IsPolish ? pl : en;
 
     public MainWindow()
     {
@@ -66,8 +72,8 @@ public partial class MainWindow : Window
 
             UpdateStatusText.Text =
                 _updateService.IsConfigured
-                    ? "GitHub Releases aktywne."
-                    : "Ustaw repozytorium w UpdateSettings.cs.";
+                    ? T("GitHub Releases aktywne.", "GitHub Releases active.")
+                    : T("Ustaw repozytorium w UpdateSettings.cs.", "Configure the repository in UpdateSettings.cs.");
 
             _tray = new TrayService(
                 ShowFromTray,
@@ -76,12 +82,12 @@ public partial class MainWindow : Window
                 OpenDownloadFolder,
                 ExitApplication);
 
-            StatusText.Text = "● Serwer aktywny";
+            StatusText.Text = T("● Serwer aktywny", "● Server active");
         }
         catch (Exception ex)
         {
             StatusText.Foreground = WpfBrushes.IndianRed;
-            StatusText.Text = $"Błąd: {ex.Message}";
+            StatusText.Text = T($"Błąd: {ex.Message}", $"Error: {ex.Message}");
         }
     }
 
@@ -145,7 +151,7 @@ public partial class MainWindow : Window
             .GetName()
             .Version?
             .ToString(3)
-            ?? "0.4.0";
+            ?? "0.5.2";
     }
 
     private void State_TransferAdded(
@@ -182,11 +188,11 @@ public partial class MainWindow : Window
             try
             {
                 WpfClipboard.SetText(_currentAddress);
-                StatusText.Text = "● Adres skopiowany";
+                StatusText.Text = T("● Adres skopiowany", "● Address copied");
             }
             catch
             {
-                StatusText.Text = "Nie udało się skopiować adresu.";
+                StatusText.Text = T("Nie udało się skopiować adresu.", "Could not copy the address.");
             }
         });
     }
@@ -200,7 +206,7 @@ public partial class MainWindow : Window
 
             _tray?.ShowMessage(
                 "DropLAN",
-                "Utworzono nową sesję parowania.");
+                T("Utworzono nową sesję parowania.", "A new pairing session was created."));
         });
     }
 
@@ -238,8 +244,10 @@ public partial class MainWindow : Window
         Hide();
 
         _tray?.ShowMessage(
-            "DropLAN działa w tle",
-            "Serwer nadal działa. Otwórz aplikację z ikony przy zegarku.");
+            T("DropLAN działa w tle", "DropLAN is running in the background"),
+            T(
+                "Serwer nadal działa. Otwórz aplikację z ikony przy zegarku.",
+                "The server is still running. Open the app from the tray icon."));
     }
 
     private async void CheckUpdatesButton_Click(
@@ -249,7 +257,9 @@ public partial class MainWindow : Window
         if (!_updateService.IsConfigured)
         {
             WpfMessageBox.Show(
-                "Najpierw ustaw adres repozytorium GitHub w UpdateSettings.cs.",
+                T(
+                    "Najpierw ustaw adres repozytorium GitHub w UpdateSettings.cs.",
+                    "Configure the GitHub repository URL in UpdateSettings.cs first."),
                 "DropLAN",
                 WpfMessageBoxButton.OK,
                 WpfMessageBoxImage.Information);
@@ -259,7 +269,7 @@ public partial class MainWindow : Window
 
         CheckUpdatesButton.IsEnabled = false;
         UpdateProgress.Visibility = Visibility.Collapsed;
-        UpdateStatusText.Text = "Sprawdzanie aktualizacji…";
+        UpdateStatusText.Text = T("Sprawdzanie aktualizacji…", "Checking for updates…");
 
         try
         {
@@ -267,31 +277,33 @@ public partial class MainWindow : Window
 
             if (update == null)
             {
-                UpdateStatusText.Text =
-                    "Masz najnowszą wersję.";
+                UpdateStatusText.Text = T("Masz najnowszą wersję.", "You have the latest version.");
                 return;
             }
 
             var targetVersion =
                 update.TargetFullRelease.Version?.ToString()
-                ?? "nowsza wersja";
+                ?? T("nowsza wersja", "newer version");
 
             var answer = WpfMessageBox.Show(
-                $"Dostępna jest wersja {targetVersion}.\n\nPobrać i zainstalować aktualizację?",
-                "Aktualizacja DropLAN",
+                T(
+                    $"Dostępna jest wersja {targetVersion}.\n\nPobrać i zainstalować aktualizację?",
+                    $"Version {targetVersion} is available.\n\nDownload and install the update?"),
+                T("Aktualizacja DropLAN", "DropLAN update"),
                 WpfMessageBoxButton.YesNo,
                 WpfMessageBoxImage.Information);
 
             if (answer != WpfMessageBoxResult.Yes)
             {
-                UpdateStatusText.Text =
-                    $"Dostępna: {targetVersion}";
+                UpdateStatusText.Text = T(
+                    $"Dostępna: {targetVersion}",
+                    $"Available: {targetVersion}");
                 return;
             }
 
             UpdateProgress.Value = 0;
             UpdateProgress.Visibility = Visibility.Visible;
-            UpdateStatusText.Text = "Pobieranie aktualizacji…";
+            UpdateStatusText.Text = T("Pobieranie aktualizacji…", "Downloading update…");
 
             await _updateService.DownloadAndInstallAsync(
                 update,
@@ -300,15 +312,17 @@ public partial class MainWindow : Window
                     Dispatcher.Invoke(() =>
                     {
                         UpdateProgress.Value = progress;
-                        UpdateStatusText.Text =
-                            $"Pobieranie… {progress}%";
+                        UpdateStatusText.Text = T(
+                            $"Pobieranie… {progress}%",
+                            $"Downloading… {progress}%");
                     });
                 });
         }
         catch (Exception ex)
         {
-            UpdateStatusText.Text =
-                $"Błąd aktualizacji: {ex.Message}";
+            UpdateStatusText.Text = T(
+                $"Błąd aktualizacji: {ex.Message}",
+                $"Update error: {ex.Message}");
         }
         finally
         {
@@ -322,7 +336,7 @@ public partial class MainWindow : Window
     {
         var dialog = new WpfOpenFileDialog
         {
-            Title = "Wybierz pliki do udostępnienia",
+            Title = T("Wybierz pliki do udostępnienia", "Choose files to share"),
             Multiselect = true
         };
 
@@ -395,7 +409,9 @@ public partial class MainWindow : Window
     {
         var dialog = new WpfOpenFolderDialog
         {
-            Title = "Wybierz folder dla plików odebranych przez DropLAN",
+            Title = T(
+                "Wybierz folder dla plików odebranych przez DropLAN",
+                "Choose a folder for files received by DropLAN"),
             InitialDirectory = _state.DownloadFolder
         };
 
@@ -414,7 +430,9 @@ public partial class MainWindow : Window
         }
         catch
         {
-            StatusText.Text = "Nie udało się odczytać schowka Windows.";
+            StatusText.Text = T(
+                "Nie udało się odczytać schowka Windows.",
+                "Could not read the Windows clipboard.");
         }
     }
 
@@ -423,7 +441,7 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         _state.SetClipboard(ClipboardTextBox.Text);
-        StatusText.Text = "● Schowek udostępniony";
+        StatusText.Text = T("● Schowek udostępniony", "● Clipboard shared");
     }
 
     private void WriteWindowsClipboardButton_Click(
@@ -433,11 +451,15 @@ public partial class MainWindow : Window
         try
         {
             WpfClipboard.SetText(ClipboardTextBox.Text ?? "");
-            StatusText.Text = "● Skopiowano do schowka Windows";
+            StatusText.Text = T(
+                "● Skopiowano do schowka Windows",
+                "● Copied to Windows clipboard");
         }
         catch
         {
-            StatusText.Text = "Nie udało się zapisać do schowka Windows.";
+            StatusText.Text = T(
+                "Nie udało się zapisać do schowka Windows.",
+                "Could not write to the Windows clipboard.");
         }
     }
 
@@ -453,7 +475,7 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         CreateNewSession();
-        StatusText.Text = "● Utworzono nową sesję";
+        StatusText.Text = T("● Utworzono nową sesję", "● New session created");
     }
 
     private void TitleBar_MouseLeftButtonDown(
@@ -478,8 +500,10 @@ public partial class MainWindow : Window
         Hide();
 
         _tray?.ShowMessage(
-            "DropLAN działa w tle",
-            "Transfery i strona telefonu nadal działają.");
+            T("DropLAN działa w tle", "DropLAN is running in the background"),
+            T(
+                "Transfery i strona telefonu nadal działają.",
+                "Transfers and the phone page are still running."));
     }
 
     private async void MainWindow_Closed(
