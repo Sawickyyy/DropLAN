@@ -14,10 +14,147 @@ const uploadProgressWrap = document.getElementById("uploadProgressWrap");
 const uploadProgress = document.getElementById("uploadProgress");
 const uploadProgressText = document.getElementById("uploadProgressText");
 const uploadMessage = document.getElementById("uploadMessage");
+const languageSelect = document.getElementById("languageSelect");
+
+const translations = {
+    pl: {
+        pairTitle: "Połącz z DropLAN",
+        pairHint: "Wpisz 6-cyfrowy PIN wyświetlany na komputerze.",
+        pairButton: "Połącz urządzenie",
+        brandSubtitle: "Transfer bez chmury, prosto po LAN",
+        connecting: "Łączenie…",
+        connected: "● Połączono",
+        reconnecting: "Ponowne łączenie…",
+        installTitle: "Dodaj DropLAN do ekranu początkowego",
+        installHint: "Na iPhonie: Udostępnij → Dodaj do ekranu początkowego. Potem DropLAN otwiera się jak osobna aplikacja.",
+        sendToComputer: "Wyślij na komputer",
+        sendHint: "Zdjęcia, filmy, dokumenty albo dowolne pliki.",
+        camera: "📷 Aparat",
+        gallery: "🖼️ Galeria",
+        files: "📁 Pliki",
+        nothingSelected: "Nic nie wybrano.",
+        oneFile: "1 plik",
+        manyFiles: "plików",
+        sendButton: "Wyślij",
+        clipboardTitle: "Schowek",
+        clipboardHint: "Przerzuć tekst między iPhonem i Windowsem.",
+        clipboardPlaceholder: "Wklej tekst…",
+        shareClipboard: "Udostępnij",
+        copyClipboard: "Kopiuj",
+        computerFiles: "Pliki z komputera",
+        computerFilesHint: "Lista aktualizuje się automatycznie, bez odświeżania strony.",
+        recentTransfers: "Ostatnie transfery",
+        recentTransfersHint: "Historia bieżącej sesji.",
+        badPin: "Zły PIN albo nieaktualny kod QR.",
+        paired: "Połączono.",
+        noComputerFiles: "Na komputerze nie udostępniono jeszcze plików.",
+        download: "Pobierz",
+        noTransfers: "Brak transferów w tej sesji.",
+        chooseFilesFirst: "Najpierw wybierz pliki.",
+        uploading: "Wysyłanie…",
+        uploadComplete: "Transfer zakończony.",
+        uploadFailed: "Nie udało się wysłać plików.",
+        connectionLost: "Utracono połączenie z komputerem.",
+        downloadError: "Błąd pobierania",
+        connectionLostShort: "Utracono połączenie",
+        clipboardUpdated: "Schowek zaktualizowany.",
+        clipboardUpdateFailed: "Nie udało się zaktualizować schowka.",
+        copied: "Skopiowano.",
+        safariClipboardBlocked: "Safari zablokowało dostęp do schowka."
+    },
+    en: {
+        pairTitle: "Connect to DropLAN",
+        pairHint: "Enter the 6-digit PIN shown on your computer.",
+        pairButton: "Connect device",
+        brandSubtitle: "Cloud-free transfer over your local network",
+        connecting: "Connecting…",
+        connected: "● Connected",
+        reconnecting: "Reconnecting…",
+        installTitle: "Add DropLAN to your Home Screen",
+        installHint: "On iPhone: Share → Add to Home Screen. DropLAN will then open like a standalone app.",
+        sendToComputer: "Send to computer",
+        sendHint: "Photos, videos, documents or any other files.",
+        camera: "📷 Camera",
+        gallery: "🖼️ Gallery",
+        files: "📁 Files",
+        nothingSelected: "Nothing selected.",
+        oneFile: "1 file",
+        manyFiles: "files",
+        sendButton: "Send",
+        clipboardTitle: "Clipboard",
+        clipboardHint: "Move text between your iPhone and Windows.",
+        clipboardPlaceholder: "Paste text…",
+        shareClipboard: "Share",
+        copyClipboard: "Copy",
+        computerFiles: "Files from computer",
+        computerFilesHint: "The list updates automatically without refreshing the page.",
+        recentTransfers: "Recent transfers",
+        recentTransfersHint: "History for the current session.",
+        badPin: "Incorrect PIN or expired QR code.",
+        paired: "Connected.",
+        noComputerFiles: "No files have been shared from the computer yet.",
+        download: "Download",
+        noTransfers: "No transfers in this session.",
+        chooseFilesFirst: "Choose files first.",
+        uploading: "Uploading…",
+        uploadComplete: "Transfer complete.",
+        uploadFailed: "Could not upload the files.",
+        connectionLost: "Connection to the computer was lost.",
+        downloadError: "Download error",
+        connectionLostShort: "Connection lost",
+        clipboardUpdated: "Clipboard updated.",
+        clipboardUpdateFailed: "Could not update the clipboard.",
+        copied: "Copied.",
+        safariClipboardBlocked: "Safari blocked clipboard access."
+    }
+};
+
+let currentLanguage = localStorage.getItem("droplan_lang") || "pl";
+if (!translations[currentLanguage])
+    currentLanguage = "pl";
 
 let selectedFiles = [];
 let eventSource = null;
 let lastClipboardFromServer = "";
+
+function t(key) {
+    return translations[currentLanguage][key] || translations.pl[key] || key;
+}
+
+function applyLanguage(language) {
+    currentLanguage = translations[language] ? language : "pl";
+    localStorage.setItem("droplan_lang", currentLanguage);
+    document.documentElement.lang = currentLanguage;
+
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.dataset.i18n;
+        element.textContent = t(key);
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+        const key = element.dataset.i18nPlaceholder;
+        element.placeholder = t(key);
+    });
+
+    if (languageSelect)
+        languageSelect.value = currentLanguage;
+
+    updateSelectionSummary();
+
+    const pill = document.getElementById("connectionPill");
+    if (pill) {
+        pill.textContent = pill.classList.contains("online")
+            ? t("connected")
+            : t("connecting");
+    }
+}
+
+if (languageSelect) {
+    languageSelect.addEventListener("change", () => {
+        applyLanguage(languageSelect.value);
+        refreshState();
+    });
+}
 
 [cameraInput, galleryInput, filesInput].forEach(input => {
     input.addEventListener("change", () => {
@@ -27,17 +164,19 @@ let lastClipboardFromServer = "";
 });
 
 function updateSelectionSummary() {
+    if (!selectedSummary)
+        return;
+
     if (!selectedFiles.length) {
-        selectedSummary.textContent = "Nic nie wybrano.";
+        selectedSummary.textContent = t("nothingSelected");
         return;
     }
 
     const total = selectedFiles.reduce((sum, file) => sum + file.size, 0);
 
-    selectedSummary.textContent =
-        selectedFiles.length === 1
-            ? `${selectedFiles[0].name} • ${formatBytes(total)}`
-            : `${selectedFiles.length} plików • ${formatBytes(total)}`;
+    selectedSummary.textContent = selectedFiles.length === 1
+        ? `${selectedFiles[0].name} • ${formatBytes(total)}`
+        : `${selectedFiles.length} ${t("manyFiles")} • ${formatBytes(total)}`;
 }
 
 async function pair() {
@@ -45,7 +184,7 @@ async function pair() {
     const message = document.getElementById("pairMessage");
 
     message.className = "message";
-    message.textContent = "Łączenie…";
+    message.textContent = t("connecting");
 
     const response = await fetch("/api/pair", {
         method: "POST",
@@ -58,18 +197,20 @@ async function pair() {
 
     if (!response.ok) {
         message.className = "message error";
-        message.textContent = "Zły PIN albo nieaktualny kod QR.";
+        message.textContent = t("badPin");
         return;
     }
 
     history.replaceState({}, "", "/");
     message.className = "message good";
-    message.textContent = "Połączono.";
+    message.textContent = t("paired");
 
     await boot();
 }
 
 async function boot() {
+    applyLanguage(currentLanguage);
+
     const response = await fetch("/api/state", {
         cache: "no-store"
     });
@@ -99,7 +240,7 @@ function startRealtime() {
 
     eventSource.onopen = () => {
         pill.className = "status-pill online";
-        pill.textContent = "● Połączono";
+        pill.textContent = t("connected");
     };
 
     eventSource.onmessage = async () => {
@@ -108,7 +249,7 @@ function startRealtime() {
 
     eventSource.onerror = () => {
         pill.className = "status-pill";
-        pill.textContent = "Ponowne łączenie…";
+        pill.textContent = t("reconnecting");
     };
 }
 
@@ -147,8 +288,7 @@ function renderFiles(files) {
     const list = document.getElementById("downloadList");
 
     if (!files.length) {
-        list.innerHTML =
-            `<div class="message">Na komputerze nie udostępniono jeszcze plików.</div>`;
+        list.innerHTML = `<div class="message">${escapeHtml(t("noComputerFiles"))}</div>`;
         return;
     }
 
@@ -168,7 +308,7 @@ function renderFiles(files) {
             <button
                 class="download-btn"
                 onclick="downloadFile('${file.id}', '${escapeJs(file.name)}')">
-                Pobierz
+                ${escapeHtml(t("download"))}
             </button>
         </div>
     `).join("");
@@ -178,15 +318,14 @@ function renderHistory(items) {
     const list = document.getElementById("historyList");
 
     if (!items.length) {
-        list.innerHTML = `<div class="message">Brak transferów w tej sesji.</div>`;
+        list.innerHTML = `<div class="message">${escapeHtml(t("noTransfers"))}</div>`;
         return;
     }
 
     list.innerHTML = items.map(item => {
-        const direction =
-            item.direction === "PhoneToPc"
-                ? "iPhone → PC"
-                : "PC → iPhone";
+        const direction = item.direction === "PhoneToPc"
+            ? "iPhone → PC"
+            : "PC → iPhone";
 
         return `
             <div class="history-row">
@@ -205,7 +344,7 @@ function renderHistory(items) {
 function uploadSelected() {
     if (!selectedFiles.length) {
         uploadMessage.className = "message error";
-        uploadMessage.textContent = "Najpierw wybierz pliki.";
+        uploadMessage.textContent = t("chooseFilesFirst");
         return;
     }
 
@@ -223,7 +362,7 @@ function uploadSelected() {
     uploadProgressText.textContent = "0%";
 
     uploadMessage.className = "message";
-    uploadMessage.textContent = "Wysyłanie…";
+    uploadMessage.textContent = t("uploading");
 
     xhr.upload.onprogress = event => {
         if (!event.lengthComputable)
@@ -244,7 +383,7 @@ function uploadSelected() {
             uploadProgressText.textContent = "100%";
 
             uploadMessage.className = "message good";
-            uploadMessage.textContent = "Transfer zakończony.";
+            uploadMessage.textContent = t("uploadComplete");
 
             selectedFiles = [];
             cameraInput.value = "";
@@ -257,14 +396,14 @@ function uploadSelected() {
         }
         else {
             uploadMessage.className = "message error";
-            uploadMessage.textContent = "Nie udało się wysłać plików.";
+            uploadMessage.textContent = t("uploadFailed");
         }
     };
 
     xhr.onerror = () => {
         uploadButton.disabled = false;
         uploadMessage.className = "message error";
-        uploadMessage.textContent = "Utracono połączenie z komputerem.";
+        uploadMessage.textContent = t("connectionLost");
     };
 
     xhr.send(formData);
@@ -315,12 +454,12 @@ function downloadFile(id, fileName) {
             location.reload();
         }
         else {
-            text.textContent = "Błąd pobierania";
+            text.textContent = t("downloadError");
         }
     };
 
     xhr.onerror = () => {
-        text.textContent = "Utracono połączenie";
+        text.textContent = t("connectionLostShort");
     };
 
     xhr.send();
@@ -338,11 +477,11 @@ async function saveClipboard() {
 
     if (response.ok) {
         message.className = "message good";
-        message.textContent = "Schowek zaktualizowany.";
+        message.textContent = t("clipboardUpdated");
     }
     else {
         message.className = "message error";
-        message.textContent = "Nie udało się zaktualizować schowka.";
+        message.textContent = t("clipboardUpdateFailed");
     }
 }
 
@@ -353,7 +492,7 @@ async function copyClipboard() {
     try {
         await navigator.clipboard.writeText(textarea.value);
         message.className = "message good";
-        message.textContent = "Skopiowano.";
+        message.textContent = t("copied");
     }
     catch {
         textarea.focus();
@@ -362,11 +501,11 @@ async function copyClipboard() {
         try {
             document.execCommand("copy");
             message.className = "message good";
-            message.textContent = "Skopiowano.";
+            message.textContent = t("copied");
         }
         catch {
             message.className = "message error";
-            message.textContent = "Safari zablokowało dostęp do schowka.";
+            message.textContent = t("safariClipboardBlocked");
         }
     }
 }
@@ -388,7 +527,7 @@ function formatBytes(bytes) {
 function formatTime(value) {
     const date = new Date(value);
 
-    return date.toLocaleTimeString([], {
+    return date.toLocaleTimeString(currentLanguage === "pl" ? "pl-PL" : "en-GB", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit"
@@ -410,14 +549,12 @@ function escapeJs(value) {
         .replaceAll("'", "\\'");
 }
 
-
 function configureInstallExperience() {
     const standalone =
         window.matchMedia("(display-mode: standalone)").matches ||
         window.navigator.standalone === true;
 
-    const isIos =
-        /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
     if (isIos && !standalone) {
         document.getElementById("installHint").style.display = "block";
@@ -430,6 +567,6 @@ function configureInstallExperience() {
     }
 }
 
+applyLanguage(currentLanguage);
 configureInstallExperience();
-
 boot();
