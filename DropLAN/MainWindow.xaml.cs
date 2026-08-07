@@ -34,6 +34,8 @@ public partial class MainWindow : Window
     private readonly UpdateService _updateService = new();
     private TrayService? _tray;
     private bool _allowExit;
+    private bool _languageSelectorReady;
+    private bool _compactLayout;
 
     private static bool IsPolish =>
         CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
@@ -48,12 +50,108 @@ public partial class MainWindow : Window
 
         _server = new LocalServer(_state, _realtime);
 
+        InitializeLanguageSelector();
+        ApplyResponsiveLayout(ActualWidth > 0 ? ActualWidth : Width);
+
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
         Closing += MainWindow_Closing;
+        SizeChanged += MainWindow_SizeChanged;
 
         _state.Changed += State_Changed;
         _state.TransferAdded += State_TransferAdded;
+    }
+
+    private void InitializeLanguageSelector()
+    {
+        var settings = AppSettings.Load();
+        var language = settings.Language;
+
+        if (string.IsNullOrWhiteSpace(language))
+            language = IsPolish ? "pl" : "en";
+
+        LanguageComboBox.SelectedIndex =
+            language.Equals("en", StringComparison.OrdinalIgnoreCase)
+                ? 1
+                : 0;
+
+        _languageSelectorReady = true;
+    }
+
+    private void LanguageComboBox_SelectionChanged(
+        object sender,
+        System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (!_languageSelectorReady)
+            return;
+
+        var language = LanguageComboBox.SelectedIndex == 1
+            ? "en"
+            : "pl";
+
+        var settings = AppSettings.Load();
+        settings.Language = language;
+        settings.Save();
+
+        AppSettings.ApplyLanguage(language);
+
+        UpdateStatusText.Text = _updateService.IsConfigured
+            ? T("GitHub Releases aktywne.", "GitHub Releases active.")
+            : T("Ustaw repozytorium w UpdateSettings.cs.", "Configure the repository in UpdateSettings.cs.");
+
+        StatusText.Text = T("● Zmieniono język", "● Language changed");
+
+        RecreateTray();
+    }
+
+    private void MainWindow_SizeChanged(
+        object sender,
+        SizeChangedEventArgs e)
+    {
+        ApplyResponsiveLayout(e.NewSize.Width);
+    }
+
+    private void ApplyResponsiveLayout(double width)
+    {
+        var compact = width < 900;
+
+        if (_compactLayout == compact && IsLoaded)
+            return;
+
+        _compactLayout = compact;
+
+        if (compact)
+        {
+            LeftColumn.Width = new GridLength(1, GridUnitType.Star);
+            SpacerColumn.Width = new GridLength(0);
+            RightColumn.Width = new GridLength(0);
+
+            Grid.SetRow(LeftPanel, 0);
+            Grid.SetColumn(LeftPanel, 0);
+            Grid.SetColumnSpan(LeftPanel, 1);
+
+            Grid.SetRow(RightPanel, 1);
+            Grid.SetColumn(RightPanel, 0);
+            Grid.SetColumnSpan(RightPanel, 1);
+
+            LeftPanel.Margin = new Thickness(0, 0, 0, 18);
+        }
+        else
+        {
+            LeftColumn.Width = new GridLength(340);
+            SpacerColumn.Width = new GridLength(18);
+            RightColumn.Width = new GridLength(1, GridUnitType.Star);
+
+            Grid.SetRow(LeftPanel, 0);
+            Grid.SetColumn(LeftPanel, 0);
+            Grid.SetColumnSpan(LeftPanel, 1);
+
+            Grid.SetRow(RightPanel, 0);
+            Grid.SetColumn(RightPanel, 2);
+            Grid.SetColumnSpan(RightPanel, 1);
+
+            LeftPanel.Margin = new Thickness(0);
+        }
     }
 
     private async void MainWindow_Loaded(
@@ -62,6 +160,8 @@ public partial class MainWindow : Window
     {
         try
         {
+            ApplyResponsiveLayout(ActualWidth);
+
             await _server.StartAsync();
 
             RefreshPairingInfo();
@@ -75,12 +175,7 @@ public partial class MainWindow : Window
                     ? T("GitHub Releases aktywne.", "GitHub Releases active.")
                     : T("Ustaw repozytorium w UpdateSettings.cs.", "Configure the repository in UpdateSettings.cs.");
 
-            _tray = new TrayService(
-                ShowFromTray,
-                CopyCurrentAddress,
-                CreateNewSession,
-                OpenDownloadFolder,
-                ExitApplication);
+            RecreateTray();
 
             StatusText.Text = T("● Serwer aktywny", "● Server active");
         }
@@ -89,6 +184,18 @@ public partial class MainWindow : Window
             StatusText.Foreground = WpfBrushes.IndianRed;
             StatusText.Text = T($"Błąd: {ex.Message}", $"Error: {ex.Message}");
         }
+    }
+
+    private void RecreateTray()
+    {
+        _tray?.Dispose();
+
+        _tray = new TrayService(
+            ShowFromTray,
+            CopyCurrentAddress,
+            CreateNewSession,
+            OpenDownloadFolder,
+            ExitApplication);
     }
 
     private void State_Changed()
@@ -151,7 +258,7 @@ public partial class MainWindow : Window
             .GetName()
             .Version?
             .ToString(3)
-            ?? "0.5.2";
+            ?? "0.5.5";
     }
 
     private void State_TransferAdded(
@@ -349,7 +456,7 @@ public partial class MainWindow : Window
         WpfDragEventArgs e)
     {
         DropZone.Background = new SolidColorBrush(
-            WpfColor.FromRgb(17, 21, 31));
+            WpfColor.FromRgb(232, 238, 245));
 
         if (!e.Data.GetDataPresent(WpfDataFormats.FileDrop))
             return;
@@ -377,7 +484,7 @@ public partial class MainWindow : Window
         e.Effects = WpfDragDropEffects.Copy;
 
         DropZone.Background = new SolidColorBrush(
-            WpfColor.FromRgb(28, 31, 48));
+            WpfColor.FromRgb(220, 230, 255));
     }
 
     private void DropZone_DragLeave(
@@ -385,7 +492,7 @@ public partial class MainWindow : Window
         WpfDragEventArgs e)
     {
         DropZone.Background = new SolidColorBrush(
-            WpfColor.FromRgb(17, 21, 31));
+            WpfColor.FromRgb(232, 238, 245));
     }
 
     private void RemoveSelectedButton_Click(
