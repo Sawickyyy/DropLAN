@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Globalization;
 using Forms = System.Windows.Forms;
 
 namespace DropLAN;
@@ -6,6 +7,13 @@ namespace DropLAN;
 public sealed class TrayService : IDisposable
 {
     private readonly Forms.NotifyIcon _notifyIcon;
+
+    private static bool IsPolish =>
+        CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+            .Equals("pl", StringComparison.OrdinalIgnoreCase);
+
+    private static string T(string pl, string en) =>
+        IsPolish ? pl : en;
 
     public TrayService(
         Action openWindow,
@@ -17,31 +25,31 @@ public sealed class TrayService : IDisposable
         var menu = new Forms.ContextMenuStrip();
 
         menu.Items.Add(
-            "Otwórz DropLAN",
+            T("Otwórz DropLAN", "Open DropLAN"),
             null,
             (_, _) => openWindow());
 
         menu.Items.Add(new Forms.ToolStripSeparator());
 
         menu.Items.Add(
-            "Kopiuj adres",
+            T("Kopiuj adres", "Copy address"),
             null,
             (_, _) => copyAddress());
 
         menu.Items.Add(
-            "Nowa sesja",
+            T("Nowa sesja", "New session"),
             null,
             (_, _) => newSession());
 
         menu.Items.Add(
-            "Otwórz folder odbiorczy",
+            T("Otwórz folder odbiorczy", "Open download folder"),
             null,
             (_, _) => openDownloadFolder());
 
         menu.Items.Add(new Forms.ToolStripSeparator());
 
         menu.Items.Add(
-            "Zakończ DropLAN",
+            T("Zakończ DropLAN", "Exit DropLAN"),
             null,
             (_, _) => exitApplication());
 
@@ -61,8 +69,9 @@ public sealed class TrayService : IDisposable
         long size)
     {
         _notifyIcon.BalloonTipTitle = "DropLAN";
-        _notifyIcon.BalloonTipText =
-            $"Odebrano: {fileName} ({FormatBytes(size)})";
+        _notifyIcon.BalloonTipText = IsPolish
+            ? $"Odebrano: {fileName} ({FormatBytes(size)})"
+            : $"Received: {fileName} ({FormatBytes(size)})";
         _notifyIcon.BalloonTipIcon = Forms.ToolTipIcon.Info;
         _notifyIcon.ShowBalloonTip(3500);
     }
