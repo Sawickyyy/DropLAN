@@ -2,26 +2,63 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AppSubtitle">Transfer lokalny</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">Język</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConnectPhone">Połącz telefon</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanQrHint">Zeskanuj QR, potem wpisz PIN.</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Address">Adres</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CopyAddress">Kopiuj adres</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Theme">Motyw</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavHome">Strona główna</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSend">Wyślij</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavReceive">Odbierz</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavClipboard">Schowek</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavHistory">Historia</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSettings">Ustawienia</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ServerStatus">SERWER</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Ready">Gotowy</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="HomeTitle">Strona główna</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="HomeSubtitle">Połącz telefon i rozpocznij transfer w sieci lokalnej.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SendTitle">Wyślij pliki</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SendSubtitle">Wybierz pliki, które mają być dostępne na telefonie.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceiveTitle">Odebrane pliki</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceiveSubtitle">Zarządzaj folderem odbiorczym i ostatnimi transferami.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ClipboardTitle">Schowek</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ClipboardSubtitle">Synchronizuj tekst między Windowsem a telefonem.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="HistoryTitle">Historia transferów</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="HistorySubtitle">Przegląd bieżącej sesji DropLAN.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">Ustawienia</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsSubtitle">Dostosuj wygląd i zachowanie aplikacji.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PairTitle">Połącz telefon</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PairSubtitle">Zeskanuj kod QR aparatem telefonu, a następnie wpisz wyświetlony PIN.</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NewSession">Nowa sesja</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="QuickActions">Szybkie akcje</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="QuickActionsHint">Najczęściej używane funkcje DropLAN.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GoSend">Wyślij pliki</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GoClipboard">Otwórz schowek</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="OpenDownloadFolder">Otwórz folder odebranych</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RecentTransfers">Ostatnie transfery</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ViewAll">Zobacz wszystko</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadFolder">Folder odbiorczy</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="OpenFolder">Otwórz folder</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ChangeFolder">Zmień folder</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedRecently">Ostatnio odebrane</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Updates">Aktualizacje</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckUpdates">Sprawdź aktualizacje</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShareFiles">Udostępnij pliki</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DropFilesHint">Przeciągnij tutaj pliki albo wybierz je ręcznie.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DropFilesHint">Przeciągnij pliki tutaj albo wybierz je ręcznie.</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddFiles">+ Dodaj pliki</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReadyToDownload">Gotowe do pobrania</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PhoneAutoRefresh">Strona na telefonie aktualizuje się automatycznie.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PhoneAutoRefresh">Lista na telefonie aktualizuje się automatycznie.</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Remove">Usuń</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Clear">Wyczyść</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Clipboard">Schowek</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ClipboardHint">Tekst synchronizowany w czasie rzeczywistym.</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReadClipboard">Pobierz ze schowka Windows</sys:String>
-    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Publish">Udostępnij</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReadClipboard">Pobierz z Windows</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Publish">Wyślij do telefonu</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="WriteClipboard">Kopiuj do Windows</sys:String>
     <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TransferHistory">Historia transferów</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="HistoryHint">Pliki wysłane i odebrane podczas bieżącej sesji.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Appearance">Wygląd</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AppearanceHint">Język i motyw interfejsu.</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Behavior">Zachowanie</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="MinimizeToTray">Minimalizuj do zasobnika po zamknięciu</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TransferNotifications">Powiadomienia o odebranych plikach</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AutoCheckUpdates">Automatycznie sprawdzaj aktualizacje</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="About">O aplikacji</sys:String>
+    <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AboutText">Szybki lokalny transfer plików bez kont i bez chmury.</sys:String>
 </ResourceDictionary>
