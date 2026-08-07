@@ -82,9 +82,9 @@
     <Border Background="#090B10"
             BorderBrush="#202533"
             BorderThickness="1"
-            CornerRadius="18">
+            CornerRadius="18" Margin="0,0,0,-198">
 
-        <Grid>
+        <Grid Margin="-9,9,9,9">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="52"/>
@@ -120,7 +120,7 @@
                     <StackPanel Margin="10,0,0,0"
                                 VerticalAlignment="Center">
 
-                        <TextBlock Text="DropLAN 0.5.2"
+                        <TextBlock Text="DropLAN 0.5.5"
                                    FontSize="15"
                                    FontWeight="SemiBold"/>
 
