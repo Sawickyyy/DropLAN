@@ -21,7 +21,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
 namespace DropLAN;
 
 public partial class MainWindow : Window
@@ -29,111 +28,84 @@ public partial class MainWindow : Window
     private readonly SharedState _state = new();
     private readonly RealtimeBroker _realtime = new();
     private readonly LocalServer _server;
-
     private string _currentAddress = "";
     private readonly UpdateService _updateService = new();
     private TrayService? _tray;
     private bool _allowExit;
     private bool _languageSelectorReady;
     private bool _compactLayout;
-
     private static bool IsPolish =>
         CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
             .Equals("pl", StringComparison.OrdinalIgnoreCase);
-
     private static string T(string pl, string en) =>
         IsPolish ? pl : en;
-
     public MainWindow()
     {
         InitializeComponent();
-
         _server = new LocalServer(_state, _realtime);
-
         InitializeLanguageSelector();
         ApplyResponsiveLayout(ActualWidth > 0 ? ActualWidth : Width);
-
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
         Closing += MainWindow_Closing;
         SizeChanged += MainWindow_SizeChanged;
-
         _state.Changed += State_Changed;
         _state.TransferAdded += State_TransferAdded;
     }
-
     private void InitializeLanguageSelector()
     {
         var settings = AppSettings.Load();
         var language = settings.Language;
-
         if (string.IsNullOrWhiteSpace(language))
             language = IsPolish ? "pl" : "en";
-
         LanguageComboBox.SelectedIndex =
             language.Equals("en", StringComparison.OrdinalIgnoreCase)
                 ? 1
                 : 0;
-
         _languageSelectorReady = true;
     }
-
     private void LanguageComboBox_SelectionChanged(
         object sender,
         System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (!_languageSelectorReady)
             return;
-
         var language = LanguageComboBox.SelectedIndex == 1
             ? "en"
             : "pl";
-
         var settings = AppSettings.Load();
         settings.Language = language;
         settings.Save();
-
         AppSettings.ApplyLanguage(language);
-
         UpdateStatusText.Text = _updateService.IsConfigured
             ? T("GitHub Releases aktywne.", "GitHub Releases active.")
             : T("Ustaw repozytorium w UpdateSettings.cs.", "Configure the repository in UpdateSettings.cs.");
-
         StatusText.Text = T("● Zmieniono język", "● Language changed");
-
         RecreateTray();
     }
-
     private void MainWindow_SizeChanged(
         object sender,
         SizeChangedEventArgs e)
     {
         ApplyResponsiveLayout(e.NewSize.Width);
     }
-
     private void ApplyResponsiveLayout(double width)
     {
         var compact = width < 900;
-
         if (_compactLayout == compact && IsLoaded)
             return;
-
         _compactLayout = compact;
-
         if (compact)
         {
             LeftColumn.Width = new GridLength(1, GridUnitType.Star);
             SpacerColumn.Width = new GridLength(0);
             RightColumn.Width = new GridLength(0);
-
             Grid.SetRow(LeftPanel, 0);
             Grid.SetColumn(LeftPanel, 0);
             Grid.SetColumnSpan(LeftPanel, 1);
-
             Grid.SetRow(RightPanel, 1);
             Grid.SetColumn(RightPanel, 0);
             Grid.SetColumnSpan(RightPanel, 1);
-
             LeftPanel.Margin = new Thickness(0, 0, 0, 18);
         }
         else
@@ -141,19 +113,15 @@ public partial class MainWindow : Window
             LeftColumn.Width = new GridLength(340);
             SpacerColumn.Width = new GridLength(18);
             RightColumn.Width = new GridLength(1, GridUnitType.Star);
-
             Grid.SetRow(LeftPanel, 0);
             Grid.SetColumn(LeftPanel, 0);
             Grid.SetColumnSpan(LeftPanel, 1);
-
             Grid.SetRow(RightPanel, 0);
             Grid.SetColumn(RightPanel, 2);
             Grid.SetColumnSpan(RightPanel, 1);
-
             LeftPanel.Margin = new Thickness(0);
         }
     }
-
     private async void MainWindow_Loaded(
         object sender,
         RoutedEventArgs e)
@@ -161,22 +129,16 @@ public partial class MainWindow : Window
         try
         {
             ApplyResponsiveLayout(ActualWidth);
-
             await _server.StartAsync();
-
             RefreshPairingInfo();
             RefreshUiFromState();
-
             VersionText.Text =
                 $"DropLAN {GetCurrentVersion()}";
-
             UpdateStatusText.Text =
                 _updateService.IsConfigured
                     ? T("GitHub Releases aktywne.", "GitHub Releases active.")
                     : T("Ustaw repozytorium w UpdateSettings.cs.", "Configure the repository in UpdateSettings.cs.");
-
             RecreateTray();
-
             StatusText.Text = T("● Serwer aktywny", "● Server active");
         }
         catch (Exception ex)
@@ -185,11 +147,9 @@ public partial class MainWindow : Window
             StatusText.Text = T($"Błąd: {ex.Message}", $"Error: {ex.Message}");
         }
     }
-
     private void RecreateTray()
     {
         _tray?.Dispose();
-
         _tray = new TrayService(
             ShowFromTray,
             CopyCurrentAddress,
@@ -197,61 +157,44 @@ public partial class MainWindow : Window
             OpenDownloadFolder,
             ExitApplication);
     }
-
     private void State_Changed()
     {
         Dispatcher.Invoke(RefreshUiFromState);
     }
-
     private void RefreshUiFromState()
     {
         DownloadFolderText.Text = _state.DownloadFolder;
-
         SharedFilesList.ItemsSource = null;
         SharedFilesList.ItemsSource = _state.GetSharedFiles();
-
         HistoryList.ItemsSource = null;
         HistoryList.ItemsSource = _state.GetHistory();
-
         if (!ClipboardTextBox.IsKeyboardFocusWithin)
             ClipboardTextBox.Text = _state.ClipboardText;
     }
-
     private void RefreshPairingInfo()
     {
         _currentAddress = _server.GetPairUrl();
-
         AddressText.Text = _currentAddress;
         PinText.Text = _server.PairPin;
-
         GenerateQrCode(_currentAddress);
     }
-
     private void GenerateQrCode(string text)
     {
         using var generator = new QRCodeGenerator();
-
         using var data = generator.CreateQrCode(
             text,
             QRCodeGenerator.ECCLevel.Q);
-
         using var qr = new PngByteQRCode(data);
-
         var bytes = qr.GetGraphic(18);
-
         using var stream = new MemoryStream(bytes);
-
         var bitmap = new BitmapImage();
-
         bitmap.BeginInit();
         bitmap.CacheOption = BitmapCacheOption.OnLoad;
         bitmap.StreamSource = stream;
         bitmap.EndInit();
         bitmap.Freeze();
-
         QrImage.Source = bitmap;
     }
-
     private static string GetCurrentVersion()
     {
         return Assembly.GetExecutingAssembly()
@@ -260,14 +203,12 @@ public partial class MainWindow : Window
             .ToString(3)
             ?? "0.5.5";
     }
-
     private void State_TransferAdded(
         TransferHistoryItem item)
     {
         if (item.Direction != TransferDirection.PhoneToPc ||
             item.Status != "Zakończono")
             return;
-
         Dispatcher.Invoke(() =>
         {
             _tray?.ShowTransferNotification(
@@ -275,7 +216,6 @@ public partial class MainWindow : Window
                 item.Size);
         });
     }
-
     private void ShowFromTray()
     {
         Dispatcher.Invoke(() =>
@@ -287,7 +227,6 @@ public partial class MainWindow : Window
             Topmost = false;
         });
     }
-
     private void CopyCurrentAddress()
     {
         Dispatcher.Invoke(() =>
@@ -303,25 +242,21 @@ public partial class MainWindow : Window
             }
         });
     }
-
     private void CreateNewSession()
     {
         Dispatcher.Invoke(() =>
         {
             _server.RegenerateSession();
             RefreshPairingInfo();
-
             _tray?.ShowMessage(
                 "DropLAN",
                 T("Utworzono nową sesję parowania.", "A new pairing session was created."));
         });
     }
-
     private void OpenDownloadFolder()
     {
         var folder = _state.DownloadFolder;
         Directory.CreateDirectory(folder);
-
         Process.Start(
             new ProcessStartInfo
             {
@@ -329,7 +264,6 @@ public partial class MainWindow : Window
                 UseShellExecute = true
             });
     }
-
     private void ExitApplication()
     {
         Dispatcher.Invoke(() =>
@@ -339,24 +273,20 @@ public partial class MainWindow : Window
             WpfApplication.Current.Shutdown();
         });
     }
-
     private void MainWindow_Closing(
         object? sender,
         CancelEventArgs e)
     {
         if (_allowExit)
             return;
-
         e.Cancel = true;
         Hide();
-
         _tray?.ShowMessage(
             T("DropLAN działa w tle", "DropLAN is running in the background"),
             T(
                 "Serwer nadal działa. Otwórz aplikację z ikony przy zegarku.",
                 "The server is still running. Open the app from the tray icon."));
     }
-
     private async void CheckUpdatesButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -370,28 +300,22 @@ public partial class MainWindow : Window
                 "DropLAN",
                 WpfMessageBoxButton.OK,
                 WpfMessageBoxImage.Information);
-
             return;
         }
-
         CheckUpdatesButton.IsEnabled = false;
         UpdateProgress.Visibility = Visibility.Collapsed;
         UpdateStatusText.Text = T("Sprawdzanie aktualizacji…", "Checking for updates…");
-
         try
         {
             var update = await _updateService.CheckAsync();
-
             if (update == null)
             {
                 UpdateStatusText.Text = T("Masz najnowszą wersję.", "You have the latest version.");
                 return;
             }
-
             var targetVersion =
                 update.TargetFullRelease.Version?.ToString()
                 ?? T("nowsza wersja", "newer version");
-
             var answer = WpfMessageBox.Show(
                 T(
                     $"Dostępna jest wersja {targetVersion}.\n\nPobrać i zainstalować aktualizację?",
@@ -399,7 +323,6 @@ public partial class MainWindow : Window
                 T("Aktualizacja DropLAN", "DropLAN update"),
                 WpfMessageBoxButton.YesNo,
                 WpfMessageBoxImage.Information);
-
             if (answer != WpfMessageBoxResult.Yes)
             {
                 UpdateStatusText.Text = T(
@@ -407,11 +330,9 @@ public partial class MainWindow : Window
                     $"Available: {targetVersion}");
                 return;
             }
-
             UpdateProgress.Value = 0;
             UpdateProgress.Visibility = Visibility.Visible;
             UpdateStatusText.Text = T("Pobieranie aktualizacji…", "Downloading update…");
-
             await _updateService.DownloadAndInstallAsync(
                 update,
                 progress =>
@@ -436,7 +357,6 @@ public partial class MainWindow : Window
             CheckUpdatesButton.IsEnabled = true;
         }
     }
-
     private void AddFilesButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -446,31 +366,24 @@ public partial class MainWindow : Window
             Title = T("Wybierz pliki do udostępnienia", "Choose files to share"),
             Multiselect = true
         };
-
         if (dialog.ShowDialog() == true)
             _state.AddSharedFiles(dialog.FileNames);
     }
-
     private void DropZone_Drop(
         object sender,
         WpfDragEventArgs e)
     {
         DropZone.Background = new SolidColorBrush(
             WpfColor.FromRgb(232, 238, 245));
-
         if (!e.Data.GetDataPresent(WpfDataFormats.FileDrop))
             return;
-
         if (e.Data.GetData(WpfDataFormats.FileDrop) is not string[] paths)
             return;
-
         var files = paths
             .Where(File.Exists)
             .ToArray();
-
         _state.AddSharedFiles(files);
     }
-
     private void DropZone_DragEnter(
         object sender,
         WpfDragEventArgs e)
@@ -480,13 +393,10 @@ public partial class MainWindow : Window
             e.Effects = WpfDragDropEffects.None;
             return;
         }
-
         e.Effects = WpfDragDropEffects.Copy;
-
         DropZone.Background = new SolidColorBrush(
             WpfColor.FromRgb(220, 230, 255));
     }
-
     private void DropZone_DragLeave(
         object sender,
         WpfDragEventArgs e)
@@ -494,7 +404,6 @@ public partial class MainWindow : Window
         DropZone.Background = new SolidColorBrush(
             WpfColor.FromRgb(232, 238, 245));
     }
-
     private void RemoveSelectedButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -502,14 +411,12 @@ public partial class MainWindow : Window
         if (SharedFilesList.SelectedItem is SharedFileItem selected)
             _state.RemoveSharedFile(selected.Id);
     }
-
     private void ClearSharedButton_Click(
         object sender,
         RoutedEventArgs e)
     {
         _state.ClearSharedFiles();
     }
-
     private void ChangeFolderButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -521,11 +428,9 @@ public partial class MainWindow : Window
                 "Choose a folder for files received by DropLAN"),
             InitialDirectory = _state.DownloadFolder
         };
-
         if (dialog.ShowDialog() == true)
             _state.SetDownloadFolder(dialog.FolderName);
     }
-
     private void ReadWindowsClipboardButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -542,7 +447,6 @@ public partial class MainWindow : Window
                 "Could not read the Windows clipboard.");
         }
     }
-
     private void PublishClipboardButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -550,7 +454,6 @@ public partial class MainWindow : Window
         _state.SetClipboard(ClipboardTextBox.Text);
         StatusText.Text = T("● Schowek udostępniony", "● Clipboard shared");
     }
-
     private void WriteWindowsClipboardButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -569,14 +472,12 @@ public partial class MainWindow : Window
                 "Could not write to the Windows clipboard.");
         }
     }
-
     private void CopyAddressButton_Click(
         object sender,
         RoutedEventArgs e)
     {
         CopyCurrentAddress();
     }
-
     private void NewSessionButton_Click(
         object sender,
         RoutedEventArgs e)
@@ -584,7 +485,6 @@ public partial class MainWindow : Window
         CreateNewSession();
         StatusText.Text = T("● Utworzono nową sesję", "● New session created");
     }
-
     private void TitleBar_MouseLeftButtonDown(
         object sender,
         MouseButtonEventArgs e)
@@ -592,37 +492,31 @@ public partial class MainWindow : Window
         if (e.ButtonState == MouseButtonState.Pressed)
             DragMove();
     }
-
     private void MinimizeButton_Click(
         object sender,
         RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
     }
-
     private void CloseButton_Click(
         object sender,
         RoutedEventArgs e)
     {
         Hide();
-
         _tray?.ShowMessage(
             T("DropLAN działa w tle", "DropLAN is running in the background"),
             T(
                 "Transfery i strona telefonu nadal działają.",
                 "Transfers and the phone page are still running."));
     }
-
     private async void MainWindow_Closed(
         object? sender,
         EventArgs e)
     {
         _state.Changed -= State_Changed;
         _state.TransferAdded -= State_TransferAdded;
-
         _tray?.Dispose();
         _tray = null;
-
         await _server.StopAsync();
     }
 }
