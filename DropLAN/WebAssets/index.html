@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#090b10">
+    <meta name="theme-color" content="#e8eef5">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="DropLAN">
 
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <title>DropLAN</title>
-
     <link rel="stylesheet" href="/style.css">
 </head>
 
 <body>
-
 <div id="pairView" class="shell hidden">
     <div class="card pair-card">
-        <div class="mark" style="margin:0 auto 14px;">D</div>
-        <h2 style="font-size:22px;">Połącz z DropLAN</h2>
-        <p class="sub">Wpisz 6-cyfrowy PIN wyświetlany na komputerze.</p>
+        <div class="mark" style="margin:0 auto 15px;">D</div>
+        <h2 data-i18n="pairTitle">Połącz z DropLAN</h2>
+        <p class="sub" data-i18n="pairHint">Wpisz 6-cyfrowy PIN wyświetlany na komputerze.</p>
 
         <input
             id="pinInput"
@@ -32,54 +30,58 @@
             autocomplete="one-time-code"
             placeholder="000000">
 
-        <button class="primary" onclick="pair()">Połącz urządzenie</button>
+        <button class="primary" onclick="pair()" data-i18n="pairButton">Połącz urządzenie</button>
         <div id="pairMessage" class="message"></div>
     </div>
 </div>
 
 <div id="appView" class="shell hidden">
-
     <div class="topbar">
         <div class="brand">
             <div class="mark">D</div>
             <div>
                 <h1>DropLAN</h1>
-                <p>Transfer bez chmury, prosto po LAN</p>
+                <p data-i18n="brandSubtitle">Transfer bez chmury, prosto po LAN</p>
             </div>
         </div>
 
-        <div id="connectionPill" class="status-pill">
-            Łączenie…
+        <div class="top-actions">
+            <select id="languageSelect" class="language-select" aria-label="Language">
+                <option value="pl">Polski</option>
+                <option value="en">English</option>
+            </select>
+
+            <div id="connectionPill" class="status-pill" data-i18n="connecting">
+                Łączenie…
+            </div>
         </div>
     </div>
 
-    <div id="installHint" class="card full" style="margin-bottom:14px; display:none;">
-        <h2>Dodaj DropLAN do ekranu początkowego</h2>
-        <p class="sub" style="margin-bottom:0;">
-            Na iPhonie: Udostępnij → Dodaj do ekranu początkowego.
-            Potem DropLAN otwiera się jak osobna aplikacja.
+    <div id="installHint" class="card full install-card" style="display:none;">
+        <h2 data-i18n="installTitle">Dodaj DropLAN do ekranu początkowego</h2>
+        <p class="sub" style="margin-bottom:0;" data-i18n="installHint">
+            Na iPhonie: Udostępnij → Dodaj do ekranu początkowego. Potem DropLAN otwiera się jak osobna aplikacja.
         </p>
     </div>
 
     <div class="grid">
-
         <section class="card">
-            <h2>Wyślij na komputer</h2>
-            <p class="sub">Zdjęcia, filmy, dokumenty albo dowolne pliki.</p>
+            <h2 data-i18n="sendToComputer">Wyślij na komputer</h2>
+            <p class="sub" data-i18n="sendHint">Zdjęcia, filmy, dokumenty albo dowolne pliki.</p>
 
             <div class="actions">
-                <button class="action-btn" onclick="cameraInput.click()">📷 Aparat</button>
-                <button class="action-btn" onclick="galleryInput.click()">🖼️ Galeria</button>
-                <button class="action-btn" onclick="filesInput.click()">📁 Pliki</button>
+                <button class="action-btn" onclick="cameraInput.click()" data-i18n="camera">📷 Aparat</button>
+                <button class="action-btn" onclick="galleryInput.click()" data-i18n="gallery">🖼️ Galeria</button>
+                <button class="action-btn" onclick="filesInput.click()" data-i18n="files">📁 Pliki</button>
             </div>
 
             <input id="cameraInput" class="hidden" type="file" accept="image/*" capture="environment">
             <input id="galleryInput" class="hidden" type="file" accept="image/*,video/*" multiple>
             <input id="filesInput" class="hidden" type="file" multiple>
 
-            <div id="selectedSummary" class="file-summary">Nic nie wybrano.</div>
+            <div id="selectedSummary" class="file-summary"></div>
 
-            <button id="uploadButton" class="primary" onclick="uploadSelected()">
+            <button id="uploadButton" class="primary" onclick="uploadSelected()" data-i18n="sendButton">
                 Wyślij
             </button>
 
@@ -94,35 +96,33 @@
         </section>
 
         <section class="card">
-            <h2>Schowek</h2>
-            <p class="sub">Przerzuć tekst między iPhonem i Windowsem.</p>
+            <h2 data-i18n="clipboardTitle">Schowek</h2>
+            <p class="sub" data-i18n="clipboardHint">Przerzuć tekst między iPhonem i Windowsem.</p>
 
-            <textarea id="clipboardText" placeholder="Wklej tekst…"></textarea>
+            <textarea id="clipboardText" data-i18n-placeholder="clipboardPlaceholder" placeholder="Wklej tekst…"></textarea>
 
             <div class="clip-actions">
-                <button class="ghost" onclick="saveClipboard()">Udostępnij</button>
-                <button class="ghost" onclick="copyClipboard()">Kopiuj</button>
+                <button class="ghost" onclick="saveClipboard()" data-i18n="shareClipboard">Udostępnij</button>
+                <button class="ghost" onclick="copyClipboard()" data-i18n="copyClipboard">Kopiuj</button>
             </div>
 
             <div id="clipboardMessage" class="message"></div>
         </section>
 
         <section class="card full">
-            <h2>Pliki z komputera</h2>
-            <p class="sub">Lista aktualizuje się automatycznie, bez odświeżania strony.</p>
+            <h2 data-i18n="computerFiles">Pliki z komputera</h2>
+            <p class="sub" data-i18n="computerFilesHint">Lista aktualizuje się automatycznie, bez odświeżania strony.</p>
             <div id="downloadList" class="list"></div>
         </section>
 
         <section class="card full">
-            <h2>Ostatnie transfery</h2>
-            <p class="sub">Historia bieżącej sesji.</p>
+            <h2 data-i18n="recentTransfers">Ostatnie transfery</h2>
+            <p class="sub" data-i18n="recentTransfersHint">Historia bieżącej sesji.</p>
             <div id="historyList"></div>
         </section>
-
     </div>
 </div>
 
 <script src="/app.js" defer></script>
-
 </body>
 </html>
