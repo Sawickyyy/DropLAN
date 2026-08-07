@@ -121,8 +121,8 @@
                     <StackPanel Margin="10,0,0,0"
                                 VerticalAlignment="Center">
 
-                        <TextBlock Text="DropLAN"
-                                   FontSize="15"
+                        <TextBlock Text="DropLAN 0.5.2"
+                        FontSize="15"
                                    FontWeight="SemiBold"/>
 
                         <TextBlock Text="Local transfer"
