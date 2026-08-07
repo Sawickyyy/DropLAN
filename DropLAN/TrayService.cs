@@ -17,7 +17,6 @@ public sealed class TrayService : IDisposable
 
     public TrayService(
         Action openWindow,
-        Action copyAddress,
         Action newSession,
         Action openDownloadFolder,
         Action exitApplication)
@@ -59,9 +58,7 @@ public sealed class TrayService : IDisposable
         _notifyIcon.DoubleClick += (_, _) => openWindow();
     }
 
-    public void ShowTransferNotification(
-        string fileName,
-        long size)
+    public void ShowTransferNotification(string fileName, long size)
     {
         _notifyIcon.BalloonTipTitle = "DropLAN";
         _notifyIcon.BalloonTipText = IsPolish
@@ -71,9 +68,7 @@ public sealed class TrayService : IDisposable
         _notifyIcon.ShowBalloonTip(3500);
     }
 
-    public void ShowMessage(
-        string title,
-        string message)
+    public void ShowMessage(string title, string message)
     {
         _notifyIcon.BalloonTipTitle = title;
         _notifyIcon.BalloonTipText = message;
@@ -88,8 +83,7 @@ public sealed class TrayService : IDisposable
         double value = bytes;
         var index = 0;
 
-        while (value >= 1024 &&
-               index < units.Length - 1)
+        while (value >= 1024 && index < units.Length - 1)
         {
             value /= 1024;
             index++;
