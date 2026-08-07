@@ -3,18 +3,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DropLAN"
         Width="520"
-        Height="330"
+        Height="340"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
-        Background="#090B10"
+        Background="#E8EEF5"
         AllowsTransparency="True">
 
-    <Border Background="#11151F"
-            BorderBrush="#292F3D"
+    <Border Background="#E8EEF5"
+            BorderBrush="#FFFFFF"
             BorderThickness="1"
-            CornerRadius="22"
+            CornerRadius="26"
             Padding="30">
+        <Border.Effect>
+            <DropShadowEffect Color="#AEBAC7"
+                              BlurRadius="24"
+                              ShadowDepth="8"
+                              Direction="315"
+                              Opacity="0.45"/>
+        </Border.Effect>
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -23,28 +31,50 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="DropLAN"
-                       Foreground="White"
-                       FontSize="28"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"/>
+            <StackPanel HorizontalAlignment="Center">
+                <Border Width="52"
+                        Height="52"
+                        CornerRadius="17"
+                        Background="#5878F3"
+                        HorizontalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#5878F3"
+                                          BlurRadius="16"
+                                          ShadowDepth="5"
+                                          Opacity="0.28"/>
+                    </Border.Effect>
+                    <TextBlock Text="D"
+                               Foreground="White"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <TextBlock Text="DropLAN"
+                           Margin="0,10,0,0"
+                           Foreground="#293548"
+                           FontSize="25"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
 
             <StackPanel Grid.Row="1"
                         Margin="0,10,0,0">
                 <TextBlock Text="Wybierz język / Choose language"
-                           Foreground="#F7F8FB"
+                           Foreground="#293548"
                            FontSize="18"
                            FontWeight="SemiBold"
                            HorizontalAlignment="Center"/>
                 <TextBlock Text="Wybór zostanie zapamiętany / Your choice will be remembered"
-                           Foreground="#7F899B"
+                           Foreground="#718096"
                            FontSize="11"
                            Margin="0,6,0,0"
                            HorizontalAlignment="Center"/>
             </StackPanel>
 
             <Grid Grid.Row="2"
-                  Margin="0,26,0,26">
+                  Margin="0,22,0,22">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="16"/>
@@ -54,29 +84,45 @@
                 <Button Grid.Column="0"
                         Click="PolishButton_Click"
                         Cursor="Hand"
-                        Background="#191E2A"
-                        BorderBrush="#343B4D"
+                        Background="#E8EEF5"
+                        BorderBrush="#FFFFFF"
                         BorderThickness="1"
                         Padding="18">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
+                            <Border x:Name="Surface"
+                                    Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="16"
+                                    CornerRadius="18"
                                     Padding="{TemplateBinding Padding}">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#B5C0CC"
+                                                      BlurRadius="14"
+                                                      ShadowDepth="5"
+                                                      Direction="315"
+                                                      Opacity="0.42"/>
+                                </Border.Effect>
                                 <StackPanel>
                                     <TextBlock Text="🇵🇱"
-                                               FontSize="32"
+                                               FontSize="30"
                                                HorizontalAlignment="Center"/>
                                     <TextBlock Text="Polski"
-                                               Foreground="White"
+                                               Foreground="#293548"
                                                FontSize="16"
                                                FontWeight="SemiBold"
                                                Margin="0,8,0,0"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Surface" Property="Background" Value="#F1F5FA"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Surface" Property="Background" Value="#DDE5EE"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
@@ -84,29 +130,45 @@
                 <Button Grid.Column="2"
                         Click="EnglishButton_Click"
                         Cursor="Hand"
-                        Background="#191E2A"
-                        BorderBrush="#343B4D"
+                        Background="#E8EEF5"
+                        BorderBrush="#FFFFFF"
                         BorderThickness="1"
                         Padding="18">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
+                            <Border x:Name="Surface"
+                                    Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="16"
+                                    CornerRadius="18"
                                     Padding="{TemplateBinding Padding}">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#B5C0CC"
+                                                      BlurRadius="14"
+                                                      ShadowDepth="5"
+                                                      Direction="315"
+                                                      Opacity="0.42"/>
+                                </Border.Effect>
                                 <StackPanel>
                                     <TextBlock Text="🇬🇧"
-                                               FontSize="32"
+                                               FontSize="30"
                                                HorizontalAlignment="Center"/>
                                     <TextBlock Text="English"
-                                               Foreground="White"
+                                               Foreground="#293548"
                                                FontSize="16"
                                                FontWeight="SemiBold"
                                                Margin="0,8,0,0"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Surface" Property="Background" Value="#F1F5FA"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Surface" Property="Background" Value="#DDE5EE"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
@@ -114,7 +176,7 @@
 
             <TextBlock Grid.Row="3"
                        Text="DropLAN • Local transfer"
-                       Foreground="#626B7D"
+                       Foreground="#7B8799"
                        FontSize="10"
                        HorizontalAlignment="Center"/>
         </Grid>
