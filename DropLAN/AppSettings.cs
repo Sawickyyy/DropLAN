@@ -1,0 +1,65 @@
+using System.Globalization;
+using System.IO;
+using System.Text.Json;
+
+namespace DropLAN;
+
+public sealed class AppSettings
+{
+    private static readonly string SettingsDirectory = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "DropLAN");
+
+    private static readonly string SettingsPath = Path.Combine(
+        SettingsDirectory,
+        "settings.json");
+
+    public string? Language { get; set; }
+
+    public static AppSettings Load()
+    {
+        try
+        {
+            if (!File.Exists(SettingsPath))
+                return new AppSettings();
+
+            var json = File.ReadAllText(SettingsPath);
+            return JsonSerializer.Deserialize<AppSettings>(json)
+                   ?? new AppSettings();
+        }
+        catch
+        {
+            return new AppSettings();
+        }
+    }
+
+    public void Save()
+    {
+        Directory.CreateDirectory(SettingsDirectory);
+
+        var json = JsonSerializer.Serialize(
+            this,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+        File.WriteAllText(SettingsPath, json);
+    }
+
+    public static void ApplyLanguage(string language)
+    {
+        var cultureName = language.Equals(
+            "pl",
+            StringComparison.OrdinalIgnoreCase)
+            ? "pl-PL"
+            : "en-GB";
+
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+    }
+}
