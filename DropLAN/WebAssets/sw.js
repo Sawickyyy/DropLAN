@@ -1,4 +1,4 @@
-const CACHE_NAME = "droplan-shell-v0.5.0";
+const CACHE_NAME = "droplan-shell-v0.5.5";
 const SHELL = [
   "/",
   "/style.css",
@@ -35,7 +35,6 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET")
     return;
 
-  // API/transfery mają zawsze iść bezpośrednio do aktywnego PC.
   const url = new URL(request.url);
 
   if (
