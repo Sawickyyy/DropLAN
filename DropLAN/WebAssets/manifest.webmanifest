@@ -1,12 +1,12 @@
 {
   "name": "DropLAN",
   "short_name": "DropLAN",
-  "description": "Lokalny transfer plików między telefonem i komputerem.",
+  "description": "Local file transfer between phone and computer.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#080a0f",
-  "theme_color": "#090b10",
+  "background_color": "#e8eef5",
+  "theme_color": "#e8eef5",
   "icons": [
     {
       "src": "/icon-192.png",
