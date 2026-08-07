@@ -32,11 +32,6 @@ public sealed class TrayService : IDisposable
         menu.Items.Add(new Forms.ToolStripSeparator());
 
         menu.Items.Add(
-            T("Kopiuj adres", "Copy address"),
-            null,
-            (_, _) => copyAddress());
-
-        menu.Items.Add(
             T("Nowa sesja", "New session"),
             null,
             (_, _) => newSession());
