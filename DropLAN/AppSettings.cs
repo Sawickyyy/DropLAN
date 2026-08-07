@@ -67,7 +67,7 @@ public sealed class AppSettings
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
 
-        var app = Application.Current;
+        var app = System.Windows.Application.Current;
         if (app == null)
             return;
 
