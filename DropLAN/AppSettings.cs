@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 
 namespace DropLAN;
 
@@ -49,9 +50,13 @@ public sealed class AppSettings
 
     public static void ApplyLanguage(string language)
     {
-        var cultureName = language.Equals(
+        var normalized = language.Equals(
             "pl",
             StringComparison.OrdinalIgnoreCase)
+            ? "pl"
+            : "en";
+
+        var cultureName = normalized == "pl"
             ? "pl-PL"
             : "en-GB";
 
@@ -61,5 +66,26 @@ public sealed class AppSettings
         CultureInfo.DefaultThreadCurrentUICulture = culture;
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
+
+        var app = Application.Current;
+        if (app == null)
+            return;
+
+        var oldDictionary = app.Resources.MergedDictionaries
+            .FirstOrDefault(dictionary =>
+                dictionary.Source?.OriginalString.Contains(
+                    "Localization/Strings.",
+                    StringComparison.OrdinalIgnoreCase) == true);
+
+        if (oldDictionary != null)
+            app.Resources.MergedDictionaries.Remove(oldDictionary);
+
+        app.Resources.MergedDictionaries.Add(
+            new ResourceDictionary
+            {
+                Source = new Uri(
+                    $"Localization/Strings.{normalized}.xaml",
+                    UriKind.Relative)
+            });
     }
 }
